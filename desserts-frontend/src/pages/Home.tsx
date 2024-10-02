@@ -1,8 +1,18 @@
-import { useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import DessertCard, { DessertCardProp } from "../components/DessertCard";
+import Cart, { CartItemType } from "../components/Cart";
+
+export const CartContext = createContext<
+    | {
+          cart: CartItemType[];
+          setCart: React.Dispatch<React.SetStateAction<CartItemType[]>>;
+      }
+    | undefined
+>(undefined);
 
 const Home = () => {
     const [desserts, setDesserts] = useState<DessertCardProp[]>([]);
+    const [cart, setCart] = useState<CartItemType[]>([]);
 
     useEffect(() => {
         fetch("/data.json")
@@ -11,16 +21,19 @@ const Home = () => {
     }, []);
 
     return (
-        <div>
-            <section>
-                <h1>Desserts</h1>
-                <div className="cards-grid">
-                    {desserts.map((dessert) => (
-                        <DessertCard {...dessert} />
-                    ))}
-                </div>
-            </section>
-        </div>
+        <CartContext.Provider value={{ cart: cart, setCart: setCart }}>
+            <div className="home">
+                <section className="dessert-panel">
+                    <h1>Desserts</h1>
+                    <div className="cards-grid">
+                        {desserts.map((dessert) => (
+                            <DessertCard {...dessert} />
+                        ))}
+                    </div>
+                </section>
+                <Cart />
+            </div>
+        </CartContext.Provider>
     );
 };
 
